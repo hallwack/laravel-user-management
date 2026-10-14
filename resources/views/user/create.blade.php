@@ -10,8 +10,18 @@
             <h1 class="text-2xl font-bold text-slate-100">Create User</h1>
         </div>
 
+        @if ($errors->any())
+            <div class="bg-rose-950/50 border border-rose-700 text-rose-200 px-4 py-3 rounded-lg text-sm">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div>
-            <form action="#" method="POST" class="flex flex-col gap-4">
+            <form action="{{ route('users.store') }}" method="POST" class="flex flex-col gap-4">
                 @csrf
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -20,6 +30,9 @@
                         <input type="text" name="name" id="name"
                             class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-900"
                             required>
+                        @error('name')
+                            <span class="text-rose-400 text-sm mt-1">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="flex flex-col gap-2">
@@ -27,6 +40,9 @@
                         <input type="email" name="email" id="email"
                             class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-900"
                             required>
+                        @error('email')
+                            <span class="text-rose-400 text-sm mt-1">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -36,6 +52,9 @@
                         <input type="password" name="password" id="password"
                             class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-900"
                             required>
+                        @error('password')
+                            <span class="text-rose-400 text-sm mt-1">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="flex flex-col gap-2">
@@ -43,6 +62,9 @@
                         <input type="password" name="password_confirmation" id="password_confirmation"
                             class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-900"
                             required>
+                        @error('password_confirmation')
+                            <span class="text-rose-400 text-sm mt-1">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -51,6 +73,9 @@
                     <input type="text" name="hobbies" id="hobbies"
                         class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-700 text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-900"
                         required>
+                    @error('hobbies')
+                        <span class="text-rose-400 text-sm mt-1">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <button type="submit"
