@@ -14,7 +14,7 @@
 </head>
 
 <body
-    class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
+    class="bg-slate-950 text-slate-100 flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
     <div class="flex w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
         <main class="flex w-full flex-col-reverse lg:flex-row">
             @yield('content')
