@@ -58,19 +58,13 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(User $user)
     {
-        //
+        return view('user.edit', [
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -78,7 +72,33 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $validated = $request->validated();
+
+        if (isset($validated['password']) && $validated['password'] === '') {
+            unset($validated['password']);
+        }
+
+        DB::transaction(function () use ($validated, $user) {
+            $user->update(
+                [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => isset($validated['password']) ? Hash::make($validated['password']) : $user->password,
+                ]
+            );
+
+            $hobbies = collect(explode(',', $validated['hobbies'] ?? ''))
+                ->map(fn ($hobby) => trim($hobby))
+                ->filter(fn ($hobby) => ! empty($hobby))
+                ->map(fn ($hobby) => ucwords(strtolower($hobby)))
+                ->unique()
+                ->values();
+
+            $user->hobbies()->delete();
+            $user->hobbies()->createMany($hobbies->map(fn ($hobby) => ['name' => $hobby])->all());
+        });
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     /**
@@ -86,6 +106,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }
