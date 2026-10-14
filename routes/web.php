@@ -15,4 +15,4 @@ Route::get('register', function () {
     return view('register');
 })->name('register');
 
-Route::resource('users', UserController::class);
+Route::resource('users', UserController::class)->except(['show']);

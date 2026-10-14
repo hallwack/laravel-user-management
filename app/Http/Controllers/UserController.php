@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -13,7 +15,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('user.index');
+        $users = User::with('hobbies')->latest()->get();
+
+        return view('user.index', [
+            'users' => $users,
+        ]);
     }
 
     /**
@@ -29,15 +35,26 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        //
-    }
+        $validated = $request->validated();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
+        DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $hobbies = collect(explode(',', $validated['hobbies'] ?? ''))
+                ->map(fn ($hobby) => trim($hobby))
+                ->filter(fn ($hobby) => ! empty($hobby))
+                ->map(fn ($hobby) => ucwords(strtolower($hobby)))
+                ->unique()
+                ->values();
+
+            $user->hobbies()->createMany($hobbies->map(fn ($hobby) => ['name' => $hobby])->all());
+        });
+
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
     /**
@@ -45,7 +62,9 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return view('user.edit', [
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -53,7 +72,33 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $validated = $request->validated();
+
+        if (isset($validated['password']) && $validated['password'] === '') {
+            unset($validated['password']);
+        }
+
+        DB::transaction(function () use ($validated, $user) {
+            $user->update(
+                [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => isset($validated['password']) ? Hash::make($validated['password']) : $user->password,
+                ]
+            );
+
+            $hobbies = collect(explode(',', $validated['hobbies'] ?? ''))
+                ->map(fn ($hobby) => trim($hobby))
+                ->filter(fn ($hobby) => ! empty($hobby))
+                ->map(fn ($hobby) => ucwords(strtolower($hobby)))
+                ->unique()
+                ->values();
+
+            $user->hobbies()->delete();
+            $user->hobbies()->createMany($hobbies->map(fn ($hobby) => ['name' => $hobby])->all());
+        });
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     /**
@@ -61,6 +106,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }
