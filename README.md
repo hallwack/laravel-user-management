@@ -97,10 +97,10 @@ Pastikan guard `api` di `config/auth.php` menggunakan driver `jwt`:
 
 Implementasikan `Tymon\JWTAuth\Contracts\JWTSubject` pada model `App\Models\User` dengan method `getJWTIdentifier()` dan `getJWTCustomClaims()`.
 
-4. **Migrasi database**
+4. **Migrasi database & seed data**
 
 ```bash
-   php artisan migrate
+   php artisan migrate -seed
 ```
 
 5. **Jalankan server**
