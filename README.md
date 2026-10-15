@@ -50,6 +50,7 @@ Aplikasi menyediakan **dua antarmuka** dengan operasi CRUD yang sama:
 1. **Clone repository & install dependency**
 
 ```bash
+   git clone git@github.com:hallwack/laravel-user-management.git
    composer install
 ```
 
